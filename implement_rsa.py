@@ -1,21 +1,13 @@
-#key generator
-
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-def key_generator():
 
-    private_key = rsa.generate_private_key(
-        public_exponent=65537,
-        key_size=2048
-    )
+#ambas as chaves (publica e privada)
+private_key = rsa.generate_private_key(
+    public_exponent=65537,
+    key_size=2048
+)
+public_key = private_key.public_key()
 
-    numbers = private_key.private_numbers()
-
-    n = numbers.public_numbers.n
-    e = numbers.public_numbers.e
-    d = numbers.d
-
-    return (n,e,d)
 
 #evaluation e inversion
 
