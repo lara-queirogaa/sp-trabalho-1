@@ -1,82 +1,115 @@
 import os
 import hashlib
 import timeit
+import statistics
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-#funções auxiliares
+# funções auxiliares
 def int_to_bytes(i):
     return i.to_bytes((i.bit_length() + 7) // 8, byteorder='big')
 
 def bytes_to_int(b):
     return int.from_bytes(b, byteorder='big')
 
-#chaves (publica e private), r e r depois de cryptado com rsa(mesmo para todos os files)
+# chaves RSA
 private_key = rsa.generate_private_key(
     public_exponent=65537,
     key_size=2048
 )
 public_key = private_key.public_key()
 
-r = os.urandom(32)
-r_int = bytes_to_int(r)
-rsa_r = pow(r_int, public_key.public_numbers().e, public_key.public_numbers().n)
-
-# Encriptação estilo OAEP simplificado
-def encrypt_file(filename):
+# Encriptação
+def encrypt_file(filename, r):
     with open(filename, "rb") as f:
         m = f.read()
 
     block_size = 32
-    n_blocks = (len(m) + block_size - 1) // block_size
     encrypted_blocks = []
 
-    for i in range(n_blocks):
+    for i in range((len(m) + block_size - 1) // block_size):
         block = m[i*block_size:(i+1)*block_size]
+
         hasher = hashlib.sha256()
         hasher.update(i.to_bytes(4, 'big') + r)
         hash_block = hasher.digest()
-        #xor
+
         cipher_block = bytes(a ^ b for a, b in zip(block, hash_block[:len(block)]))
         encrypted_blocks.append(cipher_block)
 
     return encrypted_blocks
 
-def decrypt_file(encrypted_blocks):
+# Decriptação
+def decrypt_file(encrypted_blocks, r):
     decrypted = bytearray()
+
     for i, cipher_block in enumerate(encrypted_blocks):
         hasher = hashlib.sha256()
         hasher.update(i.to_bytes(4, 'big') + r)
         hash_block = hasher.digest()
+
         plain_block = bytes(a ^ b for a, b in zip(cipher_block, hash_block[:len(cipher_block)]))
         decrypted.extend(plain_block)
-    
+
     return decrypted
 
-#medição do tempo de execução
-def make_encrypt_wrapper(filename):
-    return lambda: encrypt_file(filename)
+# wrappers
+def make_encrypt_wrapper(filename, r):
+    return lambda: encrypt_file(filename, r)
 
-def make_decrypt_wrapper(rsa_r, enc_blocks):
-    return lambda: decrypt_file(rsa_r, enc_blocks)
+def make_decrypt_wrapper(enc_blocks, r):
+    return lambda: decrypt_file(enc_blocks, r)
 
+# medição
 sizes = [8,64,512,4096,32768,262144,2097152]
+
+encrypt_mean_list = []
+encrypt_std_list = []
+decrypt_mean_list = []
+decrypt_std_list = []
+
+repeats = 30
 
 for size in sizes:
     filename = f"ficheiro_{size}.txt"
 
-    # Encriptação
-    encrypt_wrapper = make_encrypt_wrapper(filename)
-    rsa_r, enc_blocks = encrypt_file(filename)  # uma vez para pegar os outputs
-    encrypt_time = timeit.timeit(encrypt_wrapper, number=3) / 3
-    print(f"Encriptação {filename} ({size} bytes): {encrypt_time:.4f} s (média)")
+    # gerar novo r para cada ficheiro
+    r = os.urandom(32)
+    r_int = bytes_to_int(r)
 
-    # Decriptação
-    decrypt_wrapper = make_decrypt_wrapper(rsa_r, enc_blocks)
-    decrypt_time = timeit.timeit(decrypt_wrapper, number=3) / 3
-    print(f"Decriptação {filename} ({size} bytes): {decrypt_time:.4f} s (média)")
+    # RSA(r)
+    rsa_r = pow(r_int,
+                public_key.public_numbers().e,
+                public_key.public_numbers().n)
 
-    # Verificar correção
+    # wrappers
+    encrypt_wrapper = make_encrypt_wrapper(filename, r)
+
+    # encriptar uma vez para obter blocos
+    enc_blocks = encrypt_file(filename, r)
+
+    # medir encriptação
+    encrypt_times = timeit.repeat(encrypt_wrapper, repeat=repeats, number=1)
+    encrypt_times_us = [t*1e6 for t in encrypt_times]
+
+    encrypt_mean = statistics.mean(encrypt_times_us)
+    encrypt_std = statistics.stdev(encrypt_times_us)
+
+    print(f"Encriptação {filename}: {encrypt_mean:.2f} ± {encrypt_std:.2f} μs")
+
+    # medir decriptação
+    decrypt_wrapper = make_decrypt_wrapper(enc_blocks, r)
+
+    decrypt_times = timeit.repeat(decrypt_wrapper, repeat=repeats, number=1)
+    decrypt_times_us = [t*1e6 for t in decrypt_times]
+
+    decrypt_mean = statistics.mean(decrypt_times_us)
+    decrypt_std = statistics.stdev(decrypt_times_us)
+
+    print(f"Decriptação {filename}: {decrypt_mean:.2f} ± {decrypt_std:.2f} μs")
+
+    # verificação
     with open(filename, "rb") as f:
         original = f.read()
-    decrypted = decrypt_file(rsa_r, enc_blocks)
-    assert decrypted == original, "Erro: decriptação falhou!"
+
+    decrypted = decrypt_file(enc_blocks, r)
+    assert decrypted == original, "Erro!"
