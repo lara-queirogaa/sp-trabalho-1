@@ -49,7 +49,7 @@ import math
 def encrypt(m,n,e):
 
     l = 32
-    r = int.from_bytes(os.urandom(32),'big')
+    r = int.from_bytes(os.urandom(32),'big') % n
 
     c0 = rsa_eval(r,e,n)
 
@@ -111,7 +111,8 @@ for s in sizes:
         dec_times.append(time.perf_counter()-start)
 
     print(
-        s,
-        statistics.mean(enc_times)*1e6,
-        statistics.mean(dec_times)*1e6
-    )
+    s,
+    "ENC:", statistics.mean(enc_times)*1e6, "±", statistics.stdev(enc_times)*1e6,
+    "DEC:", statistics.mean(dec_times)*1e6, "±", statistics.stdev(dec_times)*1e6
+)
+    
