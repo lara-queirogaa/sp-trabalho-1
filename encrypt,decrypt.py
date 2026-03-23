@@ -53,3 +53,6 @@ for s in sizes:
         "ENC:",enc_mean,"±",enc_std,
         "DEC:",dec_mean,"±",dec_std
     )
+
+
+# teste teste teste
