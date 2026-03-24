@@ -1,6 +1,7 @@
 import hashlib
 import statistics
 import timeit
+import matplotlib.pyplot as plt
 
 sizes = [8,64,512,4096,32768,262144,2097152]
 
@@ -16,7 +17,7 @@ repeats = 30  # número de repetições para o timeit
 
 for s in sizes:
     # Lê o ficheiro
-    with open(f"ficheiro_{s}.txt","rb") as f:
+    with open(f"text_files/ficheiro_{s}.txt","rb") as f:
         data = f.read()
 
     # Função lambda para timeit
@@ -37,9 +38,6 @@ for s in sizes:
 
     # Print
     print(s, "SHA:", f"{mean:.2f} ± {std:.2f}")
-
-
-import matplotlib.pyplot as plt
 
 plt.figure(figsize=(10,6))
 

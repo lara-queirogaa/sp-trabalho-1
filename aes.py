@@ -34,7 +34,7 @@ repeats = 30
 
 for s in sizes:
     # Lê o ficheiro
-    with open(f"ficheiro_{s}.txt", "rb") as f:
+    with open(f"text_files/ficheiro_{s}.txt", "rb") as f:
         data = f.read()
 
     # Define funções lambda para timeit
