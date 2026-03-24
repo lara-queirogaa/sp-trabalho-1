@@ -36,9 +36,6 @@ for s in sizes:
     sha_mean_list.append(mean)
     sha_std_list.append(std)
 
-    # Print
-    print(s, "SHA:", f"{mean:.2f} ± {std:.2f}")
-
 plt.figure(figsize=(10,6))
 
 # Plot com barras de erro
@@ -54,10 +51,10 @@ for x, y in zip(sizes, sha_mean_list):
 
 plt.xlabel("File size (bytes)")
 plt.ylabel("Time (microseconds)")
-plt.title("SHA-256 Performance (timeit)")
+plt.title("SHA-256 Performance")
 plt.grid(True, which="both", linestyle='--', alpha=0.6)
 plt.legend()
-plt.savefig("sha256_performance_timeit.png", dpi=300)
+plt.savefig("plots/sha256_performance.png", dpi=300)
 plt.show()
 
 def run_sha():

@@ -91,6 +91,7 @@ for size in sizes:
 
     encrypt_mean = statistics.mean(encrypt_times_us)
     encrypt_std = statistics.stdev(encrypt_times_us)
+    #print(f"Encriptação {filename}: {encrypt_mean:.2f} ± {encrypt_std:.2f} μs")
 
     #medir decriptação
     decrypt_wrapper = make_decrypt_wrapper(enc_blocks, r)
@@ -100,6 +101,7 @@ for size in sizes:
 
     decrypt_mean = statistics.mean(decrypt_times_us)
     decrypt_std = statistics.stdev(decrypt_times_us)
+    #print(f"Decriptação {filename}: {decrypt_mean:.2f} ± {decrypt_std:.2f} μs")
 
     #verificação
     with open(filename, "rb") as f:
@@ -134,12 +136,12 @@ for x, y in zip(sizes, decrypt_mean_list):
 
 plt.xlabel("File size (bytes)")
 plt.ylabel("Time (microseconds)")
-plt.title("Encryption/Decryption Performance (RSA-based stream)")
+plt.title("RSA performance")
 plt.legend()
 plt.grid(True, which="both", linestyle='--', alpha=0.6)
 
-plt.savefig("rsa_performance_timeit.png", dpi=300)
+plt.savefig("plots/rsa_performance.png", dpi=300)
 plt.show()
 
-def run_aes():
+def run_rsa():
     return sizes, encrypt_mean_list, encrypt_std_list, decrypt_mean_list, decrypt_std_list

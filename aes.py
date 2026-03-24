@@ -66,14 +66,6 @@ for s in sizes:
     aes_decstd.append(dec_std)
 
 
-    # Print para verificar
-    print(
-        s,
-        "ENC:", f"{enc_mean:.2f} ± {enc_std:.2f}",
-        "DEC:", f"{dec_mean:.2f} ± {dec_std:.2f}"
-    )
-
-
 
 plt.figure(figsize=(10,6))
 
@@ -93,11 +85,11 @@ for x, y in zip(sizes, aes_dec):
 
 plt.xlabel("File size (bytes)")
 plt.ylabel("Time (microseconds)")
-plt.title("AES Performance (CTR Mode) using timeit")
+plt.title("AES Performance")
 plt.legend()
 plt.grid(True, which="both", linestyle='--', alpha=0.6)
 
-plt.savefig("aes_performance_timeit_refined.png", dpi=300)
+plt.savefig("plots/aes_performance.png", dpi=300)
 plt.show()
 
 def run_aes():
