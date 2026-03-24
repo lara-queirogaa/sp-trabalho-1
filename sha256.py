@@ -36,26 +36,27 @@ for s in sizes:
     sha_mean_list.append(mean)
     sha_std_list.append(std)
 
-plt.figure(figsize=(10,6))
-
-# Plot com barras de erro
-plt.errorbar(sizes, sha_mean_list, yerr=sha_std_list, marker='o', linestyle='-', label="SHA-256")
-
-# Escala log no eixo X
-plt.xscale("log")
-plt.xticks(sizes, sizes)  # marca explicitamente os 7 tamanhos
-
-# Adiciona valores acima de cada ponto
-for x, y in zip(sizes, sha_mean_list):
-    plt.text(x, y*1.02, f"{int(y)}", ha='center', va='bottom', fontsize=8)
-
-plt.xlabel("File size (bytes)")
-plt.ylabel("Time (microseconds)")
-plt.title("SHA-256 Performance")
-plt.grid(True, which="both", linestyle='--', alpha=0.6)
-plt.legend()
-plt.savefig("plots/sha256_performance.png", dpi=300)
-plt.show()
-
 def run_sha():
     return sizes, sha_mean_list, sha_std_list
+
+if __name__ == "__main__":
+    plt.figure(figsize=(10,6))
+
+    # Plot com barras de erro
+    plt.errorbar(sizes, sha_mean_list, yerr=sha_std_list, marker='o', linestyle='-', label="SHA-256")
+
+    # Escala log no eixo X
+    plt.xscale("log")
+    plt.xticks(sizes, sizes)  # marca explicitamente os 7 tamanhos
+
+    # Adiciona valores acima de cada ponto
+    for x, y in zip(sizes, sha_mean_list):
+        plt.text(x, y*1.02, f"{int(y)}", ha='center', va='bottom', fontsize=8)
+
+    plt.xlabel("File size (bytes)")
+    plt.ylabel("Time (microseconds)")
+    plt.title("SHA-256 Performance")
+    plt.grid(True, which="both", linestyle='--', alpha=0.6)
+    plt.legend()
+    plt.savefig("plots/sha256_performance.png", dpi=300)
+    plt.show()

@@ -114,34 +114,35 @@ for size in sizes:
     decrypt_mean_list.append(decrypt_mean)
     decrypt_std_list.append(decrypt_std)
 
-plt.figure(figsize=(10,6))
-
-# plot com barras de erro
-plt.errorbar(sizes, encrypt_mean_list, yerr=encrypt_std_list,
-             marker='o', linestyle='-', label="Encryption")
-
-plt.errorbar(sizes, decrypt_mean_list, yerr=decrypt_std_list,
-             marker='o', linestyle='-', label="Decryption")
-
-# escala log no eixo X
-plt.xscale("log")
-plt.xticks(sizes, sizes)
-
-# adicionar valores acima dos pontos
-for x, y in zip(sizes, encrypt_mean_list):
-    plt.text(x, y*1.02, f"{int(y)}", ha='center', va='bottom', fontsize=8)
-
-for x, y in zip(sizes, decrypt_mean_list):
-    plt.text(x, y*1.02, f"{int(y)}", ha='center', va='bottom', fontsize=8)
-
-plt.xlabel("File size (bytes)")
-plt.ylabel("Time (microseconds)")
-plt.title("RSA performance")
-plt.legend()
-plt.grid(True, which="both", linestyle='--', alpha=0.6)
-
-plt.savefig("plots/rsa_performance.png", dpi=300)
-plt.show()
-
 def run_rsa():
     return sizes, encrypt_mean_list, encrypt_std_list, decrypt_mean_list, decrypt_std_list
+
+if __name__ == "__main__":
+    plt.figure(figsize=(10,6))
+
+    # plot com barras de erro
+    plt.errorbar(sizes, encrypt_mean_list, yerr=encrypt_std_list,
+                marker='o', linestyle='-', label="Encryption")
+
+    plt.errorbar(sizes, decrypt_mean_list, yerr=decrypt_std_list,
+                marker='o', linestyle='-', label="Decryption")
+
+    # escala log no eixo X
+    plt.xscale("log")
+    plt.xticks(sizes, sizes)
+
+    # adicionar valores acima dos pontos
+    for x, y in zip(sizes, encrypt_mean_list):
+        plt.text(x, y*1.02, f"{int(y)}", ha='center', va='bottom', fontsize=8)
+
+    for x, y in zip(sizes, decrypt_mean_list):
+        plt.text(x, y*1.02, f"{int(y)}", ha='center', va='bottom', fontsize=8)
+
+    plt.xlabel("File size (bytes)")
+    plt.ylabel("Time (microseconds)")
+    plt.title("RSA performance")
+    plt.legend()
+    plt.grid(True, which="both", linestyle='--', alpha=0.6)
+
+    plt.savefig("plots/rsa_performance.png", dpi=300)
+    plt.show()

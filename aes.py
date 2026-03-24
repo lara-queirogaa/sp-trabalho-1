@@ -65,37 +65,31 @@ for s in sizes:
     aes_encstd.append(enc_std)
     aes_decstd.append(dec_std)
 
-
-
-plt.figure(figsize=(10,6))
-
-# plot com barras de erro
-plt.errorbar(sizes, aes_enc, yerr=enc_std, marker='o', linestyle='-', label="Encryption")
-plt.errorbar(sizes, aes_dec, yerr=dec_std, marker='o', linestyle='-', label="Decryption")
-
-# escala log no eixo X
-plt.xscale("log")
-plt.xticks(sizes, sizes)  # marca explicitamente os 7 tamanhos
-
-# adicionar valores acima dos pontos
-for x, y in zip(sizes, aes_enc):
-    plt.text(x, y*1.02, f"{int(y)}", ha='center', va='bottom', fontsize=8)
-for x, y in zip(sizes, aes_dec):
-    plt.text(x, y*1.02, f"{int(y)}", ha='center', va='bottom', fontsize=8)
-
-plt.xlabel("File size (bytes)")
-plt.ylabel("Time (microseconds)")
-plt.title("AES Performance")
-plt.legend()
-plt.grid(True, which="both", linestyle='--', alpha=0.6)
-
-plt.savefig("plots/aes_performance.png", dpi=300)
-plt.show()
-
 def run_aes():
     return sizes, aes_enc, aes_encstd, aes_dec, aes_decstd
 
-# Observações para relatório:
-# - O tempo de encriptação e decriptação aumenta aproximadamente linearmente com o tamanho do ficheiro.
-# - Usamos nonce fixo apenas para benchmarking.
-# - Timeit permite medir tempos de execução mais consistentes e repetir várias vezes automaticamente.
+if __name__ == "__main__":
+    plt.figure(figsize=(10,6))
+
+    # plot com barras de erro
+    plt.errorbar(sizes, aes_enc, yerr=enc_std, marker='o', linestyle='-', label="Encryption")
+    plt.errorbar(sizes, aes_dec, yerr=dec_std, marker='o', linestyle='-', label="Decryption")
+
+    # escala log no eixo X
+    plt.xscale("log")
+    plt.xticks(sizes, sizes)  # marca explicitamente os 7 tamanhos
+
+    # adicionar valores acima dos pontos
+    for x, y in zip(sizes, aes_enc):
+        plt.text(x, y*1.02, f"{int(y)}", ha='center', va='bottom', fontsize=8)
+    for x, y in zip(sizes, aes_dec):
+        plt.text(x, y*1.02, f"{int(y)}", ha='center', va='bottom', fontsize=8)
+
+    plt.xlabel("File size (bytes)")
+    plt.ylabel("Time (microseconds)")
+    plt.title("AES Performance")
+    plt.legend()
+    plt.grid(True, which="both", linestyle='--', alpha=0.6)
+
+    plt.savefig("plots/aes_performance.png", dpi=300)
+    plt.show()
