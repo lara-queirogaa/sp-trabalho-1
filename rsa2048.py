@@ -117,7 +117,7 @@ for size in sizes:
 def run_rsa():
     return sizes, encrypt_mean_list, encrypt_std_list, decrypt_mean_list, decrypt_std_list
 
-if __name__ == "__main__":
+def plot_rsa():
     plt.figure(figsize=(10,6))
 
     # plot com barras de erro

@@ -68,7 +68,7 @@ for s in sizes:
 def run_aes():
     return sizes, aes_enc, aes_encstd, aes_dec, aes_decstd
 
-if __name__ == "__main__":
+def plot_aes():
     plt.figure(figsize=(10,6))
 
     # plot com barras de erro

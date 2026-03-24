@@ -39,7 +39,7 @@ for s in sizes:
 def run_sha():
     return sizes, sha_mean_list, sha_std_list
 
-if __name__ == "__main__":
+def plot_sha():
     plt.figure(figsize=(10,6))
 
     # Plot com barras de erro
