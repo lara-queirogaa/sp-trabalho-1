@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import timeit
 
-# Tamanhos dos ficheiros
+# tamanhos dos ficheiros
 sizes = [8, 64, 512, 4096, 32768, 262144, 2097152]
 
-# Chave AES e nonce fixo (apenas para benchmarking)
+# chave AES e nonce fixo
 key = os.urandom(32)
-nonce = os.urandom(16)  # nonce fixo para medir tempos, não para segurança
+nonce = os.urandom(16)
 
-# Funções de encriptação e decriptação
+# funções de encriptação e decriptação
 def aes_encrypt(data):
     cipher = Cipher(algorithms.AES(key), modes.CTR(nonce))
     encryptor = cipher.encryptor()
@@ -22,43 +22,40 @@ def aes_decrypt(ciphertext):
     decryptor = cipher.decryptor()
     return decryptor.update(ciphertext) + decryptor.finalize()
 
-# Listas para guardar os tempos médios
+# listas para guardar os tempos médios
 aes_enc = []
 aes_dec = []
 
 aes_encstd = []
 aes_decstd = []
 
-# Número de repetições para o timeit
+# número de repetições
 repeats = 30
 
 for s in sizes:
-    # Lê o ficheiro
     with open(f"text_files/ficheiro_{s}.txt", "rb") as f:
         data = f.read()
 
-    # Define funções lambda para timeit
     enc_func = lambda: aes_encrypt(data)
-    # Vamos precisar do ciphertext para a decriptação
     ciphertext = aes_encrypt(data)
     dec_func = lambda: aes_decrypt(ciphertext)
 
-    # Executa timeit.repeat para medir múltiplas vezes
+    # timeit.repeat para medir múltiplas vezes
     enc_times = timeit.repeat(enc_func, repeat=repeats, number=1)
     dec_times = timeit.repeat(dec_func, repeat=repeats, number=1)
 
-    # Converte para microsegundos
+    # converter para microsegundos
     enc_times_us = [t * 1e6 for t in enc_times]
     dec_times_us = [t * 1e6 for t in dec_times]
 
-    # Calcula média e desvio padrão
+    # calcular média e desvio padrão
     enc_mean = statistics.mean(enc_times_us)
     enc_std = statistics.stdev(enc_times_us)
 
     dec_mean = statistics.mean(dec_times_us)
     dec_std = statistics.stdev(dec_times_us)
 
-    # Guarda para o gráfico
+    # guarda nas listas para o gráfico
     aes_enc.append(enc_mean)
     aes_dec.append(dec_mean)
 
@@ -68,6 +65,7 @@ for s in sizes:
 def run_aes():
     return sizes, aes_enc, aes_encstd, aes_dec, aes_decstd
 
+# função para desenhar o gráfico
 def plot_aes():
     plt.figure(figsize=(10,6))
 

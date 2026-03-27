@@ -8,7 +8,7 @@ _, rsa_enc_mean, rsa_enc_std, _, _ = run_rsa()
 
 plt.figure(figsize=(10,6))
 
-# AES Encryption
+# AES encryption
 plt.errorbar(
     sizes, aes_enc_mean,
     yerr=aes_enc_std,
@@ -16,7 +16,7 @@ plt.errorbar(
     label="AES Encryption"
 )
 
-# RSA Encryption
+# RSA encryption
 plt.errorbar(
     sizes, rsa_enc_mean,
     yerr=rsa_enc_std,

@@ -8,7 +8,7 @@ _, sha_mean, sha_std = run_sha()
 
 plt.figure(figsize=(10,6))
 
-# AES Encryption
+# AES encryption
 plt.errorbar(sizes, aes_enc_mean, yerr=aes_enc_std, marker='o', linestyle='-', label="AES Encryption")
 
 # SHA-256

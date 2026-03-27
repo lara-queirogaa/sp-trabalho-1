@@ -5,21 +5,21 @@ import statistics
 from cryptography.hazmat.primitives.asymmetric import rsa
 import matplotlib.pyplot as plt
 
-#funções auxiliares
+# funções auxiliares
 def int_to_bytes(i):
     return i.to_bytes((i.bit_length() + 7) // 8, byteorder='big')
 
 def bytes_to_int(b):
     return int.from_bytes(b, byteorder='big')
 
-#chaves RSA
+# chaves RSA
 private_key = rsa.generate_private_key(
     public_exponent=65537,
     key_size=2048
 )
 public_key = private_key.public_key()
 
-#encriptação e decriptação
+# encriptação e decriptação
 def encrypt_file(filename, r):
     with open(filename, "rb") as f:
         m = f.read()
@@ -52,13 +52,6 @@ def decrypt_file(encrypted_blocks, r):
 
     return decrypted
 
-#wrappers
-def make_encrypt_wrapper(filename, r):
-    return lambda: encrypt_file(filename, r)
-
-def make_decrypt_wrapper(enc_blocks, r):
-    return lambda: decrypt_file(enc_blocks, r)
-
 sizes = [8,64,512,4096,32768,262144,2097152]
 
 encrypt_mean_list = []
@@ -71,32 +64,25 @@ repeats = 30
 for size in sizes:
     filename = f"text_files/ficheiro_{size}.txt"
 
-    #gerar novo r para cada ficheiro
-    ###PERGUNTAR AO STOR SE SE FAZ UM PARA CADA OU UM IGUAL PARA TODOS!!!!!!!!!1
+    # gerar novo r para cada ficheiro
     r = os.urandom(32)
     r_int = bytes_to_int(r)
     rsa_r = pow(r_int,
                 public_key.public_numbers().e,
                 public_key.public_numbers().n)
     
-    #wrappers
-    encrypt_wrapper = make_encrypt_wrapper(filename, r)
-
-    #encriptar uma vez para obter blocos
+    # encriptar uma vez para obter blocos
     enc_blocks = encrypt_file(filename, r)
 
     #medir encriptação
-    encrypt_times = timeit.repeat(encrypt_wrapper, repeat=repeats, number=1)
+    encrypt_times = timeit.repeat(lambda: encrypt_file(filename, r), repeat=repeats, number=1)
     encrypt_times_us = [t*1e6 for t in encrypt_times]
 
     encrypt_mean = statistics.mean(encrypt_times_us)
     encrypt_std = statistics.stdev(encrypt_times_us)
     #print(f"Encriptação {filename}: {encrypt_mean:.2f} ± {encrypt_std:.2f} μs")
 
-    #medir decriptação
-    decrypt_wrapper = make_decrypt_wrapper(enc_blocks, r)
-
-    decrypt_times = timeit.repeat(decrypt_wrapper, repeat=repeats, number=1)
+    decrypt_times = timeit.repeat(lambda: decrypt_file(enc_blocks, r), repeat=repeats, number=1)
     decrypt_times_us = [t*1e6 for t in decrypt_times]
 
     decrypt_mean = statistics.mean(decrypt_times_us)
@@ -117,6 +103,7 @@ for size in sizes:
 def run_rsa():
     return sizes, encrypt_mean_list, encrypt_std_list, decrypt_mean_list, decrypt_std_list
 
+# função para desenhar o gráfico
 def plot_rsa():
     plt.figure(figsize=(10,6))
 
