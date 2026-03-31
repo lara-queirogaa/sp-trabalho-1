@@ -5,10 +5,7 @@ import statistics
 from cryptography.hazmat.primitives.asymmetric import rsa
 import matplotlib.pyplot as plt
 
-# funções auxiliares
-def int_to_bytes(i):
-    return i.to_bytes((i.bit_length() + 7) // 8, byteorder='big')
-
+# função auxiliar
 def bytes_to_int(b):
     return int.from_bytes(b, byteorder='big')
 
@@ -78,27 +75,19 @@ for size in sizes:
     encrypt_times = timeit.repeat(lambda: encrypt_file(filename, r), repeat=repeats, number=1)
     encrypt_times_us = [t*1e6 for t in encrypt_times]
 
-    encrypt_mean = statistics.mean(encrypt_times_us)
-    encrypt_std = statistics.stdev(encrypt_times_us)
-    #print(f"Encriptação {filename}: {encrypt_mean:.2f} ± {encrypt_std:.2f} μs")
-
     decrypt_times = timeit.repeat(lambda: decrypt_file(enc_blocks, r), repeat=repeats, number=1)
     decrypt_times_us = [t*1e6 for t in decrypt_times]
-
-    decrypt_mean = statistics.mean(decrypt_times_us)
-    decrypt_std = statistics.stdev(decrypt_times_us)
-    #print(f"Decriptação {filename}: {decrypt_mean:.2f} ± {decrypt_std:.2f} μs")
 
     #verificação
     with open(filename, "rb") as f:
         original = f.read()
-
     decrypted = decrypt_file(enc_blocks, r)
     assert decrypted == original, "Erro!"
-    encrypt_mean_list.append(encrypt_mean)
-    encrypt_std_list.append(encrypt_std)
-    decrypt_mean_list.append(decrypt_mean)
-    decrypt_std_list.append(decrypt_std)
+
+    encrypt_mean_list.append(statistics.mean(encrypt_times_us))
+    encrypt_std_list.append(statistics.stdev(encrypt_times_us))
+    decrypt_mean_list.append(statistics.mean(decrypt_times_us))
+    decrypt_std_list.append(statistics.stdev(decrypt_times_us))
 
 def run_rsa():
     return sizes, encrypt_mean_list, encrypt_std_list, decrypt_mean_list, decrypt_std_list

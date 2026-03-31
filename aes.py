@@ -40,13 +40,11 @@ for s in sizes:
     with open(f"text_files/ficheiro_{s}.txt", "rb") as f:
         data = f.read()
 
-    enc_func = lambda: aes_encrypt(data)
     ciphertext = aes_encrypt(data)
-    dec_func = lambda: aes_decrypt(ciphertext)
 
     # timeit.repeat para medir múltiplas vezes
-    enc_times = timeit.repeat(enc_func, repeat=repeats, number=1)
-    dec_times = timeit.repeat(dec_func, repeat=repeats, number=1)
+    enc_times = timeit.repeat(lambda: aes_encrypt(data), repeat=repeats, number=1)
+    dec_times = timeit.repeat(lambda: aes_decrypt(ciphertext), repeat=repeats, number=1)
 
     # converter para microsegundos
     enc_times_us = [t * 1e6 for t in enc_times]
@@ -57,19 +55,12 @@ for s in sizes:
         enc_2097152_runs = enc_times_us[:15]
         dec_2097152_runs = dec_times_us[:15]
 
-    # calcular média e desvio padrão
-    enc_mean = statistics.mean(enc_times_us)
-    enc_std = statistics.stdev(enc_times_us)
+    # guarda nas listas para o gráfico a média e o desvio padrão
+    aes_enc.append(statistics.mean(enc_times_us))
+    aes_dec.append(statistics.stdev(enc_times_us))
 
-    dec_mean = statistics.mean(dec_times_us)
-    dec_std = statistics.stdev(dec_times_us)
-
-    # guarda nas listas para o gráfico
-    aes_enc.append(enc_mean)
-    aes_dec.append(dec_mean)
-
-    aes_encstd.append(enc_std)
-    aes_decstd.append(dec_std)
+    aes_encstd.append(statistics.mean(dec_times_us))
+    aes_decstd.append(statistics.stdev(dec_times_us))
 
 def run_aes():
     return sizes, aes_enc, aes_encstd, aes_dec, aes_decstd
@@ -118,3 +109,6 @@ def plot_first_15_runs():
 
     plt.savefig("plots/aes_2097152_first15.png", dpi=300)
     plt.show()
+
+run_aes()
+plot_aes()
