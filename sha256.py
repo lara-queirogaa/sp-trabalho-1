@@ -5,36 +5,27 @@ import matplotlib.pyplot as plt
 
 sizes = [8,64,512,4096,32768,262144,2097152]
 
-# Função de hash SHA-256
 def sha256_hash(data):
     return hashlib.sha256(data).digest()
 
-# Listas para guardar médias e desvios
+# listas para guardar médias e desvios
 sha_mean_list = []
 sha_std_list = []
 
-repeats = 30  # número de repetições para o timeit
+repeats = 30 
 
 for s in sizes:
-    # Lê o ficheiro
     with open(f"text_files/ficheiro_{s}.txt","rb") as f:
         data = f.read()
 
-    # Função lambda para timeit
-    hash_func = lambda: sha256_hash(data)
+    # mede várias vezes
+    times = timeit.repeat(lambda: sha256_hash(data), repeat=repeats, number=1)
 
-    # Mede várias vezes
-    times = timeit.repeat(hash_func, repeat=repeats, number=1)
-
-    # Converte para microsegundos
+    # converte para microsegundos
     times_us = [t*1e6 for t in times]
 
-    # Calcula média e desvio padrão
-    mean = statistics.mean(times_us)
-    std = statistics.stdev(times_us)
-
-    sha_mean_list.append(mean)
-    sha_std_list.append(std)
+    sha_mean_list.append(statistics.mean(times_us))
+    sha_std_list.append(statistics.stdev(times_us))
 
 def run_sha():
     return sizes, sha_mean_list, sha_std_list
