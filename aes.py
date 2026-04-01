@@ -33,6 +33,9 @@ aes_decstd = []
 enc_2097152_runs = []
 dec_2097152_runs = []
 
+enc_diff_files_runs = []
+dec_diff_files_runs = []
+
 # número de repetições
 repeats = 30
 
@@ -52,8 +55,8 @@ for s in sizes:
 
     # parte para guardar os tempos de execução
     if s == 2097152:
-        enc_2097152_runs = enc_times_us[:15]
-        dec_2097152_runs = dec_times_us[:15]
+        enc_2097152_runs = enc_times_us[:10]
+        dec_2097152_runs = dec_times_us[:10]
 
     # guarda nas listas para o gráfico a média e o desvio padrão
     aes_enc.append(statistics.mean(enc_times_us))
@@ -61,6 +64,17 @@ for s in sizes:
 
     aes_encstd.append(statistics.mean(dec_times_us))
     aes_decstd.append(statistics.stdev(dec_times_us))
+
+for i in range(1, 11):
+    data = os.urandom(2097152)
+
+    ciphertext = aes_encrypt(data)
+
+    enc_time = timeit.timeit(lambda: aes_encrypt(data), number=1) * 1e6
+    dec_time = timeit.timeit(lambda: aes_decrypt(ciphertext), number=1) * 1e6
+
+    enc_diff_files_runs.append(enc_time)
+    dec_diff_files_runs.append(dec_time)
 
 def run_aes():
     return sizes, aes_enc, aes_encstd, aes_dec, aes_decstd
@@ -93,22 +107,30 @@ def plot_aes():
     plt.show()
 
 # função que desenha o gráfico dos diferentes tempo de encriptação e decriptação 
-def plot_first_15_runs():
-    runs = list(range(1, 16))
+def plot_same_vs_diff_files():
+    runs = list(range(1, 11))
 
-    plt.figure(figsize=(10,6))
+    fig, axes = plt.subplots(1, 2, figsize=(16, 6), sharey=True)
+    fig.suptitle("AES Execution Time Comparison (File Size = 2097152 bytes)", fontsize=13)
 
-    plt.plot(runs, enc_2097152_runs, marker='o', linestyle='-', label="Encryption")
-    plt.plot(runs, dec_2097152_runs, marker='o', linestyle='-', label="Decryption")
+    # --- painel esquerdo: mesmo ficheiro, 10 execuções ---
+    axes[0].plot(runs, enc_2097152_runs, marker='o', linestyle='-', color='steelblue', label="Encryption")
+    axes[0].plot(runs, dec_2097152_runs, marker='s', linestyle='--', color='tomato',   label="Decryption")
+    axes[0].set_title("Same file – repeated runs")
+    axes[0].set_xlabel("Run number")
+    axes[0].set_ylabel("Time (microseconds)")
+    axes[0].legend()
+    axes[0].grid(True, linestyle='--', alpha=0.6)
 
-    plt.xlabel("Run number")
-    plt.ylabel("Time (microseconds)")
-    plt.title("AES Execution Time (First 15 Runs, File Size = 2097152 bytes)")
-    plt.legend()
-    plt.grid(True, linestyle='--', alpha=0.6)
+    # --- painel direito: ficheiros diferentes, 1 execução cada ---
+    axes[1].plot(runs, enc_diff_files_runs, marker='o', linestyle='-', color='steelblue', label="Encryption")
+    axes[1].plot(runs, dec_diff_files_runs, marker='s', linestyle='--', color='tomato',   label="Decryption")
+    axes[1].set_title("Different files – one run each")
+    axes[1].set_xlabel("File number")
+    axes[1].legend()
+    axes[1].grid(True, linestyle='--', alpha=0.6)
 
-    plt.savefig("plots/aes_2097152_first15.png", dpi=300)
+    plt.tight_layout()
+    plt.savefig("plots/aes_same_vs_diff_files.png", dpi=300)
     plt.show()
 
-run_aes()
-plot_aes()
